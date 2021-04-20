@@ -64,11 +64,19 @@ config_setting(
 alias(
     name = "opencv",
     actual = select({
-        ":opencv_source_build": ":opencv_cmake",
-        "//conditions:default": ":opencv_binary",
+        ":opencv_source_build": ":opencv_binary",
+        "//conditions:default": ":opencv_cmake",
     }),
     visibility = ["//visibility:public"],
 )
+#alias(
+#    name = "opencv",
+#    actual = select({
+#        ":opencv_source_build": ":opencv_cmake",
+#        "//conditions:default": ":opencv_binary",
+#    }),
+#    visibility = ["//visibility:public"],
+#)
 
 load("@rules_foreign_cc//tools/build_defs:cmake.bzl", "cmake_external")
 
@@ -90,7 +98,7 @@ OPENCV_MODULES = [
 # still only builds the shared libraries, so we have to choose one or the
 # other. We build shared libraries by default, but this variable can be used
 # to switch to static libraries.
-OPENCV_SHARED_LIBS = True
+OPENCV_SHARED_LIBS = False
 
 OPENCV_SO_VERSION = "3.4"
 
@@ -100,6 +108,7 @@ cmake_external(
     # here are serving to provide some CMake script configuration options
     cache_entries = {
         "CMAKE_BUILD_TYPE": "Release",
+        #        "CMAKE_CXX_STANDARD": "14",
         # The module list is always sorted alphabetically so that we do not
         # cause a rebuild when changing the link order.
         "BUILD_LIST": ",".join(sorted(OPENCV_MODULES)),
@@ -149,6 +158,21 @@ cmake_external(
         # the build, and so depends on what is installed on the local system.
         # After building, the linkopts for the current setup can be extracted
         # from lib/pkgconfig/opencv.pc in bazel-out
+        "-lgtk-x11-2.0",
+        "-lgdk-x11-2.0",
+        "-lpangocairo-1.0",
+        "-latk-1.0",
+        "-lcairo",
+        "-lgdk_pixbuf-2.0",
+        "-lgio-2.0",
+        "-lpangoft2-1.0",
+        "-lpango-1.0",
+        "-lgobject-2.0",
+        "-lglib-2.0",
+        "-lharfbuzz",
+        "-lfontconfig",
+        "-lfreetype",
+        "-lgthread-2.0",
         "-ljpeg",
         "-lpng",
         "-lz",

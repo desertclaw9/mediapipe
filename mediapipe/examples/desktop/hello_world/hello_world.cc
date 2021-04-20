@@ -14,10 +14,13 @@
 //
 // A simple example to print out "Hello World!" from a MediaPipe graph.
 
+#include "absl/flags/flag.h"
 #include "mediapipe/framework/calculator_graph.h"
 #include "mediapipe/framework/port/logging.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
+#include <opencv2/opencv.hpp>
+//#include <opencv2//highgui.hpp>
 
 namespace mediapipe {
 
@@ -59,8 +62,12 @@ absl::Status PrintHelloWorld() {
 }
 }  // namespace mediapipe
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   google::InitGoogleLogging(argv[0]);
+  cv::Mat camera_frame = cv::imread("/home/xharlord/workspaces/unity-ar-pcr/resources/Test/singleFace.jpg");
+  cv::line(camera_frame, {40, 40}, {120, 120}, CV_RGB(0, 0, 0), 2);
+  cv::imshow("hola", camera_frame);
+  cv::waitKey(0);
   CHECK(mediapipe::PrintHelloWorld().ok());
   return 0;
 }
