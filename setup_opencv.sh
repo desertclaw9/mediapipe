@@ -42,20 +42,15 @@ if [ -z "$1" ]
     sudo apt install cmake ffmpeg libavformat-dev libdc1394-22-dev libgtk2.0-dev \
                      libjpeg-dev libpng-dev libswscale-dev libtbb2 libtbb-dev \
                      libtiff-dev
-    rm -rf /tmp/build_opencv
-    mkdir /tmp/build_opencv
-    cd /tmp/build_opencv
-    git clone https://github.com/opencv/opencv_contrib.git
-    git clone https://github.com/opencv/opencv.git
-    mkdir opencv/release
-    cd opencv_contrib
-    git checkout 3.4
-    cd ../opencv
-    git checkout 3.4
-    cd release
-    cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr/local \
+    git clone https://github.com/opencv/opencv_contrib.git -b 3.4.13 --depth 1
+    git clone https://github.com/opencv/opencv.git -b 3.4.13 --depth 1
+    mkdir opencv/build
+    cd opencv/build
+    cmake .. -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/home/xharlord/software/Opencv/3.4/dinamic \
+          -DBUILD_SHARED_LIBS=ON \
+          -D OPENCV_GENERATE_PKGCONFIG=YES \
           -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_opencv_ts=OFF \
-          -DOPENCV_EXTRA_MODULES_PATH=/tmp/build_opencv/opencv_contrib/modules \
+          -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
           -DBUILD_opencv_aruco=OFF -DBUILD_opencv_bgsegm=OFF -DBUILD_opencv_bioinspired=OFF \
           -DBUILD_opencv_ccalib=OFF -DBUILD_opencv_datasets=OFF -DBUILD_opencv_dnn=OFF \
           -DBUILD_opencv_dnn_objdetect=OFF -DBUILD_opencv_dpm=OFF -DBUILD_opencv_face=OFF \
@@ -68,13 +63,13 @@ if [ -z "$1" ]
           -DCV_ENABLE_INTRINSICS=ON -DWITH_EIGEN=ON -DWITH_PTHREADS=ON -DWITH_PTHREADS_PF=ON \
           -DWITH_JPEG=ON -DWITH_PNG=ON -DWITH_TIFF=ON
     make -j 16
-    sudo make install
+    make install
     rm -rf /tmp/build_opencv
-    echo "OpenCV has been built. You can find the header files and libraries in /usr/local/include/opencv2/ and /usr/local/lib"
+    echo "OpenCV has been built. You can find the header files and libraries in /home/xharlord/software/Opencv/3.4/static/include/opencv2/ and /home/xharlord/software/Opencv/3.4/static/lib"
 
     # https://github.com/cggos/dip_cvqt/issues/1#issuecomment-284103343
     sudo touch /etc/ld.so.conf.d/mp_opencv.conf
-    sudo bash -c  "echo /usr/local/lib >> /etc/ld.so.conf.d/mp_opencv.conf"
+    sudo bash -c  "echo /home/xharlord/software/Opencv/3.4/static/lib >> /etc/ld.so.conf.d/mp_opencv.conf"
     sudo ldconfig -v
 fi
 
@@ -85,5 +80,5 @@ sed -i "s/lib\/x86_64-linux-gnu/lib/g" $opencv_build_file
 linux_opencv_config=$(grep -n 'linux_opencv' $workspace_file | awk -F  ":" '{print $1}')
 path_line=$((linux_opencv_config + 2))
 sed -i "$path_line d" $workspace_file
-sed -i "$path_line i\    path = \"/usr/local\"," $workspace_file
+sed -i "$path_line i\    path = \"/home/xharlord/software/Opencv/3.4/static\"," $workspace_file
 echo "Done"
