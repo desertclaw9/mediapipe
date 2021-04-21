@@ -19,7 +19,7 @@ constexpr char kOutputStreamLM[] = "multi_face_landmarks";
 
 ABSL_FLAG(std::string,
     calculator_graph_config_file,
-    "mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt",
+    "/home/ignacio/workspace/CLionProjects/mediapipe/mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt",
     "Name of file containing text format CalculatorGraphConfig proto.");
 
 namespace upm {
@@ -65,18 +65,19 @@ absl::Status RunMPPGraph(cv::Mat &camera_frame,
   // Get the graph result packet, or stop if that fails.
   mediapipe::Packet packetFrame;
   if (!pollerFrame.Next(&packetFrame)) {
+    LOG(INFO) << "aqui falla";
     MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
     return graph.WaitUntilDone();
   }
-
-  mediapipe::Packet packetLM;
-  if (!pollerLM.Next(&packetLM)) {
-    MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
-    return graph.WaitUntilDone();
-  }
+  LOG(INFO) << "siguiente packet";
+//  mediapipe::Packet packetLM;
+//  if (!pollerLM.Next(&packetLM)) {
+//    MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
+//    return graph.WaitUntilDone();
+//  }
 
   auto &output_frame = packetFrame.Get<mediapipe::ImageFrame>();
-  landMarks = packetLM.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
+//  landMarks = packetLM.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
 
   // Convert back to opencv for display or saving.
   if (showResults) {
