@@ -1,3 +1,6 @@
 bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/face_mesh_ar:facesMediapipe
+cp bazel-bin/mediapipe/examples/desktop/face_mesh_ar/libfacesMediapipe.so ~/unity-ar-pcr/MediapipeUnity/Assets/Plugins/Linux/x86_x64
 #bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/face_mesh_ar:face_mesh_main
 #bazel-bin/mediapipe/examples/desktop/face_mesh_ar/face_mesh_main
+#bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/iris_tracking:iris_depth_from_image_desktop
+#bazel-bin/mediapipe/examples/desktop/iris_tracking/iris_depth_from_image_desktop

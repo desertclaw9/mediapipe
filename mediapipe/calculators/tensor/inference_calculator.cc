@@ -60,7 +60,8 @@ absl::StatusOr<Packet<TfLiteModelPtr>> InferenceCalculator::GetModelAsPacket(
     CalculatorContext* cc) {
   const auto& options = cc->Options<mediapipe::InferenceCalculatorOptions>();
   if (!options.model_path().empty()) {
-    return TfLiteModelLoader::LoadFromPath(options.model_path());
+
+    return TfLiteModelLoader::LoadFromPath("/home/ignacio/workspace/CLionProjects/mediapipe/" + options.model_path());
   }
   if (!kSideInModel(cc).IsEmpty()) return kSideInModel(cc);
   return absl::Status(mediapipe::StatusCode::kNotFound,
