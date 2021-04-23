@@ -2,12 +2,18 @@
 #include "opencv2/core.hpp"
 #include "mediapipe/framework/formats/landmark.pb.h"
 
+#include "mediapipe/examples/desktop/face_mesh_ar/face_mesh_ar.h"
 
 #include "mediapipe/examples/desktop/face_mesh_ar/face_mesh_ar.h"
 
 extern "C" {
 
-void face_mesh_mediapipe(unsigned char *data, int width, int height, bool showResults) {
+int face_mesh_mediapipe(const char *config_file,
+                        unsigned char *data,
+                        int width,
+                        int height,
+                        float faceLandmarks[],
+                        bool showResults) {
 
   cv::Mat original_frame(cv::Size(width, height), CV_8UC4, data);
   cv::Mat color_frame;
@@ -16,10 +22,19 @@ void face_mesh_mediapipe(unsigned char *data, int width, int height, bool showRe
   cv::flip(color_frame, color_frame, 0);
 
   std::vector<mediapipe::NormalizedLandmarkList> landMarks;
-  upm::RunMPPGraph(color_frame, landMarks, showResults);
+  upm::RunMPPGraph(std::string(config_file), color_frame, landMarks, showResults);
+
+  int acc = 0;
+  for (auto &landmark : landMarks) {
+    for (int i = 0; i < landmark.landmark_size(); i++) {
+      faceLandmarks[acc++] = landmark.landmark(i).x();
+      faceLandmarks[acc++] = landmark.landmark(i).y();
+    }
+  }
 
   cv::flip(color_frame, color_frame, 0);
 
   cvtColor(color_frame, original_frame, cv::COLOR_RGB2RGBA);
+  return landMarks.size();
 }
 }

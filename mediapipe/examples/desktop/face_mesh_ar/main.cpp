@@ -5,19 +5,30 @@
 
 constexpr char kWindowName[] = "MediaPipe";
 
-int main(int argc, char **argv) {
-  google::InitGoogleLogging(argv[0]);
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+int main() {
 
-  cv::Mat camera_frame_raw = cv::imread("/home/xharlord/workspaces/unity-ar-pcr/resources/Test/singleFace.jpg");
+  if (!std::getenv("MEDIAPIPE_RESOURCES")) {
+    LOG(ERROR) << "Error. The environment variable \"MEDIAPIPE_RESOURCES\" is not defined. \n"
+               << "Please do export MEDIAPIPE_RESOURCES=YOUR_MEDIAPIPE_REPOSITORY";
+    return 0;
+  }
+
+  std::string config_file =
+      std::string(std::getenv("MEDIAPIPE_RESOURCES")) + "mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt";
+
+  cv::Mat
+      camera_frame_raw = cv::imread(std::string(std::getenv("AR_PCR_RESOURCES")) + "/Test/sinAruco.png");
 
   cv::Mat camera_frame;
   cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
   std::vector<mediapipe::NormalizedLandmarkList> landMarks;
-  absl::Status run_status = upm::RunMPPGraph(camera_frame, landMarks, true);
+  absl::Status run_status = upm::RunMPPGraph(config_file, camera_frame, landMarks, true);
 
+  cv::cvtColor(camera_frame, camera_frame, cv::COLOR_RGB2BGR);
   cv::imshow(kWindowName, camera_frame);
   cv::waitKey(0);
+
+//  LOG(INFO) << landMarks.at(0).landmark().at(0).x();
 
   if (!run_status.ok()) {
     LOG(ERROR) << "Failed to run the graph: " << run_status.message();
