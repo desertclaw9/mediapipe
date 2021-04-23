@@ -25,7 +25,8 @@ absl::Status RunMPPGraph(std::string config_file,
 
   std::string calculator_graph_config_contents;
 
-  MP_RETURN_IF_ERROR(mediapipe::file::GetContents(config_file, &calculator_graph_config_contents));
+  MP_RETURN_IF_ERROR(mediapipe::file::GetContents(std::string(
+      config_file + "mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt"), &calculator_graph_config_contents));
 
   mediapipe::CalculatorGraphConfig config = mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(
       calculator_graph_config_contents);
@@ -61,6 +62,14 @@ absl::Status RunMPPGraph(std::string config_file,
 
   // Get the graph result packet, or stop if that fails.
 
+  mediapipe::Packet packetFrame;
+  if (!pollerFrame.Next(&packetFrame)) {
+    MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
+    return graph.WaitUntilDone();
+  }
+
+  auto &output_frame = packetFrame.Get<mediapipe::ImageFrame>();
+
   mediapipe::Packet packetN;
   if (!pollerN.Next(&packetN)) {
     MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
@@ -85,14 +94,6 @@ absl::Status RunMPPGraph(std::string config_file,
   landMarks = packetLM.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
 
   if (showResults) {
-    mediapipe::Packet packetFrame;
-    if (!pollerFrame.Next(&packetFrame)) {
-      MP_RETURN_IF_ERROR(graph.CloseInputStream(kInputStream));
-      return graph.WaitUntilDone();
-    }
-
-    auto &output_frame = packetFrame.Get<mediapipe::ImageFrame>();
-
     cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
     camera_frame = output_frame_mat.clone();
   }

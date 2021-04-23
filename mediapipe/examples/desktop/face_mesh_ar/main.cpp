@@ -14,10 +14,10 @@ int main() {
   }
 
   std::string config_file =
-      std::string(std::getenv("MEDIAPIPE_RESOURCES")) + "mediapipe/graphs/face_mesh/face_mesh_desktop_live.pbtxt";
+      std::string(std::getenv("MEDIAPIPE_RESOURCES"));
 
   cv::Mat
-      camera_frame_raw = cv::imread(std::string(std::getenv("AR_PCR_RESOURCES")) + "/Test/sinAruco.png");
+      camera_frame_raw = cv::imread(std::string(std::getenv("AR_PCR_RESOURCES")) + "/Test/singleFace.jpg");
 
   cv::Mat camera_frame;
   cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
@@ -28,7 +28,7 @@ int main() {
   cv::imshow(kWindowName, camera_frame);
   cv::waitKey(0);
 
-//  LOG(INFO) << landMarks.at(0).landmark().at(0).x();
+  LOG(INFO) << landMarks.at(0).landmark().at(0).x();
 
   if (!run_status.ok()) {
     LOG(ERROR) << "Failed to run the graph: " << run_status.message();
