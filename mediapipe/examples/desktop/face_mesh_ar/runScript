@@ -1,3 +1,0 @@
-bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/face_mesh_ar:facesMediapipe
-#bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/face_mesh_ar:face_mesh_main
-#bazel-bin/mediapipe/examples/desktop/face_mesh_ar/face_mesh_main

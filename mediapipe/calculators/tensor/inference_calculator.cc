@@ -31,21 +31,21 @@ class InferenceCalculatorSelectorImpl
                           InferenceCalculatorSelectorImpl> {
  public:
   absl::StatusOr<CalculatorGraphConfig> GetConfig(
-      const CalculatorGraphConfig::Node& subgraph_node) {
-    const auto& options =
+      const CalculatorGraphConfig::Node &subgraph_node) {
+    const auto &options =
         Subgraph::GetOptions<::mediapipe::InferenceCalculatorOptions>(
             subgraph_node);
     std::vector<absl::string_view> impls;
     const bool should_use_gpu =
         !options.has_delegate() ||  // Use GPU delegate if not specified
-        (options.has_delegate() && options.delegate().has_gpu());
+            (options.has_delegate() && options.delegate().has_gpu());
     if (should_use_gpu) {
       impls.emplace_back("Metal");
       impls.emplace_back("MlDriftWebGl");
       impls.emplace_back("Gl");
     }
     impls.emplace_back("Cpu");
-    for (const auto& suffix : impls) {
+    for (const auto &suffix : impls) {
       const auto impl = absl::StrCat("InferenceCalculator", suffix);
       if (!mediapipe::CalculatorBaseRegistry::IsRegistered(impl)) continue;
       CalculatorGraphConfig::Node impl_node = subgraph_node;
@@ -57,11 +57,19 @@ class InferenceCalculatorSelectorImpl
 };
 
 absl::StatusOr<Packet<TfLiteModelPtr>> InferenceCalculator::GetModelAsPacket(
-    CalculatorContext* cc) {
-  const auto& options = cc->Options<mediapipe::InferenceCalculatorOptions>();
-  if (!options.model_path().empty()) {
-    return TfLiteModelLoader::LoadFromPath(options.model_path());
+    CalculatorContext *cc) {
+
+  const auto &options = cc->Options<mediapipe::InferenceCalculatorOptions>();
+
+  if (!std::getenv("MEDIAPIPE_RESOURCES")) {
+    LOG(ERROR) << "Error. The environment variable \"MEDIAPIPE_RESOURCES\" is not defined. \n"
+               << "Please do export MEDIAPIPE_RESOURCES=YOUR_MEDIAPIPE_REPOSITORY";
   }
+
+  else if (!options.model_path().empty()) {
+    return TfLiteModelLoader::LoadFromPath(std::getenv("MEDIAPIPE_RESOURCES") + options.model_path());
+  }
+
   if (!kSideInModel(cc).IsEmpty()) return kSideInModel(cc);
   return absl::Status(mediapipe::StatusCode::kNotFound,
                       "Must specify TFLite model as path or loaded model.");

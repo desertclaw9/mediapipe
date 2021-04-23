@@ -7,7 +7,8 @@
 
 namespace upm {
 
-absl::Status RunMPPGraph(cv::Mat &frame,
+absl::Status RunMPPGraph(std::string config_file,
+                         cv::Mat &frame,
                          std::vector<mediapipe::NormalizedLandmarkList> &landMarks,
                          bool showResults = false);
 
